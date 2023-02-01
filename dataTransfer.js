@@ -4,7 +4,8 @@
 //dateTime: là thời điểm giao tiếp 
 
 const dataTransfer = {
-    idSocket: {},
+    socket_id: "",
+    inf_user: {},
     data: {},
     dateTime: {}
 }
