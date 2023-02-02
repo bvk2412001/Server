@@ -19,6 +19,10 @@ io.on("connection", (socket) => {
     dataTransfer.socket_id = socket.id
     socket.emit(process.env.JOIN_ROOM_GLOBAL, dataTransfer)
 
+    socket.on(process.env.CREATE_ROOM_LOCAL, (data) => {
+        socket.join(data.inf_user.locale)
+    })
+
     socket.on(process.env.SEND_MESSAGE_GLOBAL, (data) => {
         data.dateTime = moment().format('lll');
         io.to(process.env.ROOM_NAME_GLOBAL).emit(process.env.SEND_MESSAGE_GLOBAL, data)
@@ -32,7 +36,7 @@ io.on("connection", (socket) => {
 
 
     })
-    
+
     socket.on(process.env.SEND_MESSAGE_PRIVATE, (data) => {
         let roomName;
         console.log(data)
@@ -43,12 +47,13 @@ io.on("connection", (socket) => {
             roomName = data.data.toUserId + data.inf_user.fbId
         }
         socket.join(roomName)
-        data.data = {socket_id_toUser : data.data.socket_id_toUser, roomName: roomName, message: data.data.message }
+        data.data = { socket_id_toUser: data.data.socket_id_toUser, roomName: roomName, message: data.data.message, toUserId: data.data.toUserId }
         data.dateTime = moment().format('lll');
         io.to(`${data.data.socket_id_toUser}`).emit(process.env.CREATE_ROOM, data)
+        io.to(`${data.socket_id}`).emit(process.env.CREATE_ROOM, data)
         io.to(`${data.socket_id}`).emit(process.env.SEND_MESSAGE_PRIVATE, data)
         io.to(`${data.data.socket_id_toUser}`).emit(process.env.SEND_MESSAGE_PRIVATE, data)
-        console.log(data);
+        console.log(data) 
     })
 })
 
